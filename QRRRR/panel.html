@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel — Gestión de Vehículos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --border2: #333;
+    --text: #f0ece4;
+    --muted: #888;
+    --accent: #d4ff5c;
+    --accent-dim: #d4ff5c22;
+    --danger: #ff5c5c;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+  /* LAYOUT */
+  .shell { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+  .sidebar { background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+  .main { padding: 2rem 2.5rem; overflow-y: auto; }
+
+  /* SIDEBAR */
+  .sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+  .logo { font-family: var(--mono); font-size: 13px; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; }
+  .logo-sub { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: var(--mono); }
+  .sidebar-section { padding: 1rem; }
+  .sidebar-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-family: var(--mono); margin-bottom: 8px; padding: 0 4px; }
+  .vehicle-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; cursor: pointer; transition: background 0.15s; border: 1px solid transparent; margin-bottom: 4px; }
+  .vehicle-item:hover { background: var(--surface2); }
+  .vehicle-item.active { background: var(--accent-dim); border-color: var(--accent); }
+  .vehicle-item.active .vi-name { color: var(--accent); }
+  .vi-icon { width: 28px; height: 28px; border-radius: 4px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .vi-info { flex: 1; overflow: hidden; }
+  .vi-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vi-plate { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .new-btn { margin: 0 1rem 1rem; padding: 10px; background: var(--accent); color: #0f0f0f; border: none; border-radius: 6px; font-family: var(--mono); font-size: 12px; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; text-transform: uppercase; width: calc(100% - 2rem); transition: opacity 0.15s; }
+  .new-btn:hover { opacity: 0.85; }
+  .sidebar-empty { padding: 1rem; font-size: 13px; color: var(--muted); font-style: italic; }
+
+  /* MAIN HEADER */
+  .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+  .page-title { font-size: 22px; font-weight: 300; letter-spacing: -0.02em; }
+  .page-title span { color: var(--accent); font-weight: 500; }
+  .page-sub { font-size: 13px; color: var(--muted); margin-top: 4px; font-family: var(--mono); }
+  .header-actions { display: flex; gap: 8px; }
+  .btn { padding: 8px 16px; border-radius: 5px; font-size: 13px; cursor: pointer; font-family: var(--sans); border: 1px solid var(--border2); background: var(--surface); color: var(--text); transition: all 0.15s; }
+  .btn:hover { border-color: #555; background: var(--surface2); }
+  .btn-accent { background: var(--accent); color: #0f0f0f; border-color: var(--accent); font-weight: 500; }
+  .btn-accent:hover { opacity: 0.85; background: var(--accent); }
+  .btn-danger { border-color: var(--danger); color: var(--danger); }
+  .btn-danger:hover { background: #ff5c5c11; }
+
+  /* FORM */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: var(--mono); }
+  input[type=text], textarea, select {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 9px 12px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: var(--sans);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  input[type=text]:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  select option { background: var(--surface); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  /* CUSTOM FIELDS */
+  .cf-row { display: grid; grid-template-columns: 1fr 1fr 32px; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .cf-remove { background: none; border: 1px solid var(--border2); border-radius: 4px; color: var(--muted); cursor: pointer; font-size: 14px; padding: 0; height: 36px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .cf-remove:hover { border-color: var(--danger); color: var(--danger); }
+  .add-field-btn { background: none; border: 1px dashed var(--border2); border-radius: 5px; color: var(--muted); cursor: pointer; font-size: 12px; padding: 8px 14px; font-family: var(--mono); transition: all 0.15s; }
+  .add-field-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* SECTION DIVIDER */
+  .section-title { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-family: var(--mono); margin: 1.75rem 0 1rem; display: flex; align-items: center; gap: 10px; }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* QR PANEL */
+  .qr-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; display: flex; gap: 2rem; align-items: flex-start; }
+  .qr-box { background: #fff; padding: 12px; border-radius: 6px; flex-shrink: 0; }
+  .qr-info { flex: 1; }
+  .qr-url-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: var(--mono); margin-bottom: 8px; }
+  .qr-url-val { font-size: 12px; color: var(--accent); font-family: var(--mono); word-break: break-all; line-height: 1.6; background: var(--accent-dim); padding: 10px 12px; border-radius: 5px; border: 1px solid #d4ff5c33; }
+  .qr-hint { font-size: 12px; color: var(--muted); margin-top: 12px; line-height: 1.6; }
+  .qr-hint strong { color: var(--text); }
+  .print-btn { margin-top: 12px; }
+
+  /* WELCOME / EMPTY */
+  .welcome { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; text-align: center; gap: 1rem; }
+  .welcome-icon { font-size: 48px; opacity: 0.3; }
+  .welcome-title { font-size: 20px; font-weight: 300; color: var(--muted); }
+  .welcome-sub { font-size: 13px; color: var(--muted); opacity: 0.6; font-family: var(--mono); }
+
+  /* BASE URL CONFIG */
+  .config-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px 16px; margin-bottom: 2rem; display: flex; align-items: center; gap: 12px; }
+  .config-bar label { white-space: nowrap; font-size: 11px; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .config-bar input { flex: 1; background: var(--bg); border: 1px solid var(--border2); border-radius: 4px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: var(--mono); outline: none; }
+  .config-bar input:focus { border-color: var(--accent); }
+  .config-hint { font-size: 11px; color: var(--muted); }
+
+  @media print {
+    .sidebar, .page-header, .form-grid, .section-title:not(.qr-st), .config-bar, .header-actions { display: none !important; }
+    .main { padding: 0; }
+    .qr-panel { border: none; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">FleetQR</div>
+      <div class="logo-sub">Panel de administración</div>
+    </div>
+    <div style="flex:1; overflow-y:auto; padding-top:0.5rem;">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Vehículos</div>
+        <div id="sidebar-list"></div>
+      </div>
+    </div>
+    <button class="new-btn" onclick="newVehicle()">+ Nuevo vehículo</button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Base URL config -->
+    <div class="config-bar">
+      <label>URL base del sitio</label>
+      <input type="text" id="base-url" placeholder="https://mi-sitio.vercel.app" oninput="saveBaseUrl()">
+      <button class="btn btn-accent" onclick="exportVehiculo()" style="white-space:nowrap;font-size:12px;padding:7px 14px;">⬇ Exportar vehiculo.html</button>
+    </div>
+
+    <div id="main-content">
+      <div class="welcome">
+        <div class="welcome-icon">🚗</div>
+        <div class="welcome-title">Ningún vehículo seleccionado</div>
+        <div class="welcome-sub">Elegí uno de la lista o creá uno nuevo</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+let vehicles = JSON.parse(localStorage.getItem('fqr_vehicles') || '[]');
+let currentId = null;
+
+function saveBaseUrl() {
+  localStorage.setItem('fqr_baseurl', document.getElementById('base-url').value.trim());
+  if (currentId) renderDetail(currentId);
+}
+
+function getBaseUrl() {
+  return (localStorage.getItem('fqr_baseurl') || '').replace(/\/$/, '');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('fqr_baseurl');
+  if (saved) document.getElementById('base-url').value = saved;
+  renderSidebar();
+});
+
+function renderSidebar() {
+  const el = document.getElementById('sidebar-list');
+  if (vehicles.length === 0) {
+    el.innerHTML = '<div class="sidebar-empty">Sin vehículos aún</div>';
+    return;
+  }
+  el.innerHTML = vehicles.map(v => `
+    <div class="vehicle-item ${v.id === currentId ? 'active' : ''}" onclick="renderDetail('${v.id}')">
+      <div class="vi-icon">${v.type || '🚗'}</div>
+      <div class="vi-info">
+        <div class="vi-name">${v.name}</div>
+        <div class="vi-plate">${v.plate || '—'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function newVehicle() {
+  currentId = null;
+  renderForm(null);
+  renderSidebar();
+}
+
+function renderDetail(id) {
+  currentId = id;
+  const v = vehicles.find(x => x.id === id);
+  if (!v) return;
+  renderSidebar();
+
+  const base = getBaseUrl();
+  const qrUrl = base
+    ? `${base}/vehiculo.html?id=${v.id}`
+    : `(configurá la URL base arriba)`;
+
+  const isReal = base !== '';
+
+  const customRows = Object.entries(v.customs || {}).map(([k, val]) =>
+    `<tr><td style="color:var(--muted);font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);width:40%;font-family:var(--mono);font-size:12px;letter-spacing:0.05em">${k}</td><td style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">${val}</td></tr>`
+  ).join('');
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">${v.type} <span>${v.name}</span></div>
+        <div class="page-sub">${v.plate || 'sin placa'} · creado el ${v.created}</div>
+      </div>
+      <div class="header-actions">
+        <button class="btn" onclick="editVehicle('${v.id}')">Editar</button>
+        <button class="btn btn-danger" onclick="deleteVehicle('${v.id}')">Eliminar</button>
+      </div>
+    </div>
+
+    <div class="section-title qr-st">Código QR para este vehículo</div>
+    <div class="qr-panel">
+      <div class="qr-box" id="qr-container-${v.id}"></div>
+      <div class="qr-info">
+        <div class="qr-url-label">URL del QR</div>
+        <div class="qr-url-val">${qrUrl}</div>
+        <div class="qr-hint">
+          Al escanear este QR, cualquier persona verá la página pública del vehículo con todos sus datos.<br><br>
+          <strong>Para imprimir:</strong> hacé click en el QR con botón derecho → Guardar imagen, o usá el botón de abajo.
+        </div>
+        ${isReal ? `<button class="btn btn-accent print-btn" onclick="printQR('${v.id}')">Imprimir / Guardar QR</button>` : `<div style="font-size:12px;color:var(--danger);margin-top:12px;font-family:var(--mono)">⚠ Configurá la URL base para generar el QR real</div>`}
+      </div>
+    </div>
+
+    <div class="section-title">Información del vehículo</div>
+    <table style="width:100%;border-collapse:collapse;">
+      ${v.brand ? `<tr><td style="color:var(--muted);font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);width:40%;font-family:var(--mono);letter-spacing:0.05em">MARCA</td><td style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">${v.brand}</td></tr>` : ''}
+      ${v.model ? `<tr><td style="color:var(--muted);font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--mono);letter-spacing:0.05em">MODELO</td><td style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">${v.model}</td></tr>` : ''}
+      ${v.year ? `<tr><td style="color:var(--muted);font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--mono);letter-spacing:0.05em">AÑO</td><td style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">${v.year}</td></tr>` : ''}
+      ${v.plate ? `<tr><td style="color:var(--muted);font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--mono);letter-spacing:0.05em">PLACA</td><td style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--mono)">${v.plate}</td></tr>` : ''}
+      ${v.color ? `<tr><td style="color:var(--muted);font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--mono);letter-spacing:0.05em">COLOR</td><td style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border)">${v.color}</td></tr>` : ''}
+      ${v.vin ? `<tr><td style="color:var(--muted);font-size:12px;padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--mono);letter-spacing:0.05em">VIN / CHASIS</td><td style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--border);font-family:var(--mono)">${v.vin}</td></tr>` : ''}
+      ${customRows}
+      ${v.notes ? `<tr><td style="color:var(--muted);font-size:12px;padding:8px 0 6px;width:40%;font-family:var(--mono);letter-spacing:0.05em">NOTAS</td><td style="font-size:13px;padding:8px 0 6px;color:var(--muted);line-height:1.6">${v.notes}</td></tr>` : ''}
+    </table>
+  `;
+
+  if (isReal) {
+    setTimeout(() => {
+      const container = document.getElementById(`qr-container-${v.id}`);
+      if (container) {
+        new QRCode(container, {
+          text: qrUrl,
+          width: 160, height: 160,
+          colorDark: '#000000', colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }
+    }, 50);
+  }
+}
+
+function printQR(id) {
+  const v = vehicles.find(x => x.id === id);
+  if (!v) return;
+  const base = getBaseUrl();
+  const qrUrl = `${base}/vehiculo.html?id=${v.id}`;
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>QR - ${v.name}</title>
+  <style>body{font-family:monospace;text-align:center;padding:2rem;}h2{font-size:18px;margin-bottom:4px;}p{color:#666;font-size:12px;margin-bottom:1rem;}</style>
+  </head><body>
+  <h2>${v.type} ${v.name}</h2>
+  <p>${v.plate || ''}</p>
+  <div id="qr"></div>
+  <p style="margin-top:1rem;font-size:10px;word-break:break-all">${qrUrl}</p>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>
+  <script>new QRCode(document.getElementById('qr'),{text:'${qrUrl}',width:200,height:200,correctLevel:QRCode.CorrectLevel.H});setTimeout(()=>window.print(),600);<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+function editVehicle(id) {
+  const v = vehicles.find(x => x.id === id);
+  if (!v) return;
+  renderForm(v);
+}
+
+function renderForm(v) {
+  const isEdit = v !== null && v !== undefined;
+  const customs = isEdit ? Object.entries(v.customs || {}) : [['', '']];
+
+  document.getElementById('main-content').innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">${isEdit ? `Editar <span>${v.name}</span>` : 'Nuevo <span>vehículo</span>'}</div>
+        <div class="page-sub">${isEdit ? 'Modificá los datos y guardá' : 'Completá la información'}</div>
+      </div>
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nombre / Alias *</label>
+        <input type="text" id="f-name" value="${isEdit ? esc(v.name) : ''}" placeholder="Ej: Camioneta de reparto">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="f-type">
+          ${['🚗 Auto','🚐 Camioneta','🚛 Camión','🏍️ Moto','🚌 Bus','🚜 Tractor','🚒 Bombero','🚑 Ambulancia','⛟ Furgón'].map(opt => {
+            const [ico, ...rest] = opt.split(' ');
+            return `<option value="${ico}" ${isEdit && v.type === ico ? 'selected' : ''}>${opt}</option>`;
+          }).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Marca</label>
+        <input type="text" id="f-brand" value="${isEdit ? esc(v.brand||'') : ''}" placeholder="Toyota">
+      </div>
+      <div class="form-group">
+        <label>Modelo</label>
+        <input type="text" id="f-model" value="${isEdit ? esc(v.model||'') : ''}" placeholder="Hilux 2023">
+      </div>
+      <div class="form-group">
+        <label>Año</label>
+        <input type="text" id="f-year" value="${isEdit ? esc(v.year||'') : ''}" placeholder="2023">
+      </div>
+      <div class="form-group">
+        <label>Placa / Matrícula</label>
+        <input type="text" id="f-plate" value="${isEdit ? esc(v.plate||'') : ''}" placeholder="ABC 123">
+      </div>
+      <div class="form-group">
+        <label>Color</label>
+        <input type="text" id="f-color" value="${isEdit ? esc(v.color||'') : ''}" placeholder="Blanco">
+      </div>
+      <div class="form-group">
+        <label>VIN / N° Chasis</label>
+        <input type="text" id="f-vin" value="${isEdit ? esc(v.vin||'') : ''}" placeholder="1HGCM82633A004352">
+      </div>
+      <div class="form-group full">
+        <label>Notas / Observaciones</label>
+        <textarea id="f-notes" placeholder="Información adicional del vehículo...">${isEdit ? esc(v.notes||'') : ''}</textarea>
+      </div>
+    </div>
+
+    <div class="section-title">Campos personalizados</div>
+    <div id="custom-fields">
+      ${customs.map(([k,val]) => cfRow(k, val)).join('')}
+    </div>
+    <button class="add-field-btn" onclick="addCF()">+ Agregar campo</button>
+
+    <div style="display:flex;gap:10px;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border)">
+      <button class="btn btn-accent" onclick="saveVehicle(${isEdit ? `'${v.id}'` : 'null'})">Guardar vehículo</button>
+      <button class="btn" onclick="${isEdit ? `renderDetail('${v.id}')` : "document.getElementById('main-content').innerHTML='<div class=welcome><div class=welcome-icon>🚗</div><div class=welcome-title>Ningún vehículo seleccionado</div></div>'"}">Cancelar</button>
+      ${isEdit ? `<button class="btn btn-danger" style="margin-left:auto" onclick="deleteVehicle('${v.id}')">Eliminar vehículo</button>` : ''}
+    </div>
+  `;
+}
+
+function cfRow(k='', v='') {
+  return `<div class="cf-row">
+    <input type="text" placeholder="Campo (ej: Seguro)" class="cf-key" value="${esc(k)}">
+    <input type="text" placeholder="Valor" class="cf-val" value="${esc(v)}">
+    <button class="cf-remove" onclick="this.closest('.cf-row').remove()">✕</button>
+  </div>`;
+}
+
+function addCF() {
+  document.getElementById('custom-fields').insertAdjacentHTML('beforeend', cfRow());
+}
+
+function saveVehicle(editId) {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { alert('El nombre es requerido'); return; }
+  const customs = {};
+  document.querySelectorAll('#custom-fields .cf-row').forEach(row => {
+    const k = row.querySelector('.cf-key').value.trim();
+    const val = row.querySelector('.cf-val').value.trim();
+    if (k) customs[k] = val;
+  });
+  const vehicle = {
+    id: editId || 'v_' + Date.now(),
+    name,
+    type: document.getElementById('f-type').value,
+    brand: document.getElementById('f-brand').value.trim(),
+    model: document.getElementById('f-model').value.trim(),
+    year: document.getElementById('f-year').value.trim(),
+    plate: document.getElementById('f-plate').value.trim(),
+    color: document.getElementById('f-color').value.trim(),
+    vin: document.getElementById('f-vin').value.trim(),
+    notes: document.getElementById('f-notes').value.trim(),
+    customs,
+    created: editId ? (vehicles.find(x=>x.id===editId)||{}).created || today() : today()
+  };
+  if (editId) {
+    const idx = vehicles.findIndex(x => x.id === editId);
+    if (idx >= 0) vehicles[idx] = vehicle;
+  } else {
+    vehicles.push(vehicle);
+  }
+  localStorage.setItem('fqr_vehicles', JSON.stringify(vehicles));
+  currentId = vehicle.id;
+  renderSidebar();
+  renderDetail(vehicle.id);
+}
+
+function deleteVehicle(id) {
+  if (!confirm('¿Eliminar este vehículo? Esta acción no se puede deshacer.')) return;
+  vehicles = vehicles.filter(x => x.id !== id);
+  currentId = null;
+  localStorage.setItem('fqr_vehicles', JSON.stringify(vehicles));
+  renderSidebar();
+  document.getElementById('main-content').innerHTML = `<div class="welcome"><div class="welcome-icon">🚗</div><div class="welcome-title">Vehículo eliminado</div><div class="welcome-sub">Seleccioná otro o creá uno nuevo</div></div>`;
+}
+
+function today() {
+  return new Date().toLocaleDateString('es-PY');
+}
+
+function esc(str) {
+  return String(str).replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function exportVehiculo() {
+  if (vehicles.length === 0) { alert('No tenés vehículos cargados todavía.'); return; }
+  const dataJson = JSON.stringify(vehicles, null, 2);
+  const html = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Información del vehículo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0d0d0d;--surface:#161616;--surface2:#1e1e1e;--border:#252525;--border2:#2e2e2e;--text:#f0ece4;--muted:#777;--accent:#d4ff5c;--mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:var(--sans);}
+  .page{max-width:480px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+  .header{margin-bottom:2rem;animation:fadeUp 0.5s ease both;}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border2);border-radius:99px;padding:4px 12px;font-size:11px;font-family:var(--mono);letter-spacing:0.08em;color:var(--muted);margin-bottom:1rem;}
+  .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+  .vehicle-hero{display:flex;align-items:center;gap:1rem;}
+  .vehicle-emoji{font-size:52px;line-height:1;}
+  .vehicle-name{font-size:26px;font-weight:500;letter-spacing:-0.02em;line-height:1.1;}
+  .vehicle-plate{font-size:14px;font-family:var(--mono);color:var(--accent);letter-spacing:0.1em;margin-top:4px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;animation:fadeUp 0.5s ease both;}
+  .card:nth-child(2){animation-delay:0.05s;}.card:nth-child(3){animation-delay:0.1s;}.card:nth-child(4){animation-delay:0.15s;}.card:nth-child(5){animation-delay:0.2s;}
+  .card-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .card-icon{font-size:14px;opacity:0.6;}.card-title{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;font-family:var(--mono);color:var(--muted);}
+  .card-body{padding:0;}
+  .info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border);}
+  .info-row:last-child{border-bottom:none;}
+  .info-key{font-size:12px;font-family:var(--mono);letter-spacing:0.06em;color:var(--muted);}
+  .info-val{font-size:14px;text-align:right;max-width:65%;}
+  .info-val.mono{font-family:var(--mono);font-size:13px;}.info-val.accent{color:var(--accent);}
+  .notes-block{padding:14px 16px;font-size:14px;line-height:1.7;color:var(--muted);font-style:italic;}
+  .footer{margin-top:3rem;text-align:center;font-size:11px;font-family:var(--mono);color:var(--border2);letter-spacing:0.06em;}
+  .footer span{color:var(--accent);}
+  .not-found{text-align:center;padding:4rem 2rem;}
+  .not-found-icon{font-size:48px;opacity:0.2;margin-bottom:1rem;}
+  .not-found-title{font-size:18px;font-weight:300;color:var(--muted);}
+  .not-found-sub{font-size:12px;color:var(--border2);font-family:var(--mono);margin-top:8px;}
+  .topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--border);max-width:480px;margin:0 auto;opacity:0.5;}
+  .topbar-logo{font-family:var(--mono);font-size:11px;letter-spacing:0.1em;color:var(--muted);}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+</style>
+</head>
+<body>
+<div class="topbar"><span class="topbar-logo">FLEETQR</span><span class="topbar-logo" id="ts"></span></div>
+<div class="page" id="content"><div class="not-found"><div class="not-found-icon">🔍</div><div class="not-found-title">Cargando...</div></div></div>
+<script>
+const VD=${dataJson};
+document.getElementById('ts').textContent=new Date().toLocaleString('es-PY',{dateStyle:'short',timeStyle:'short'});
+function gp(n){return new URLSearchParams(window.location.search).get(n);}
+function render(){
+  const id=gp('id'),el=document.getElementById('content');
+  if(!id){el.innerHTML=nf('Sin ID','Esta URL no tiene un ID válido.');return;}
+  const v=VD.find(x=>x.id===id);
+  if(!v){el.innerHTML=nf('No encontrado','ID: '+id);return;}
+  const cr=Object.entries(v.customs||{}).map(([k,val])=>'<div class="info-row"><span class="info-key">'+k.toUpperCase()+'</span><span class="info-val">'+val+'</span></div>').join('');
+  const mf=[[v.brand,'MARCA',''],[v.model,'MODELO',''],[v.year,'AÑO',''],[v.plate,'PLACA','mono accent'],[v.color,'COLOR',''],[v.vin,'VIN / CHASIS','mono']].filter(x=>x[0]);
+  el.innerHTML='<div class="header"><div class="badge"><span class="badge-dot"></span>Información verificada</div><div class="vehicle-hero"><div class="vehicle-emoji">'+(v.type||'🚗')+'</div><div><div class="vehicle-name">'+v.name+'</div>'+(v.plate?'<div class="vehicle-plate">'+v.plate+'</div>':'')+'</div></div></div>'
+    +(mf.length?'<div class="card"><div class="card-header"><span class="card-icon">📋</span><span class="card-title">Datos del vehículo</span></div><div class="card-body">'+mf.map(([val,k,cls])=>'<div class="info-row"><span class="info-key">'+k+'</span><span class="info-val '+cls+'">'+val+'</span></div>').join('')+'</div></div>':'')
+    +(cr?'<div class="card"><div class="card-header"><span class="card-icon">⚙️</span><span class="card-title">Información adicional</span></div><div class="card-body">'+cr+'</div></div>':'')
+    +(v.notes?'<div class="card"><div class="card-header"><span class="card-icon">📝</span><span class="card-title">Notas</span></div><div class="card-body"><div class="notes-block">'+v.notes+'</div></div></div>':'')
+    +'<div class="card"><div class="card-header"><span class="card-icon">📅</span><span class="card-title">Registro</span></div><div class="card-body"><div class="info-row"><span class="info-key">REGISTRADO</span><span class="info-val mono">'+(v.created||'—')+'</span></div><div class="info-row"><span class="info-key">ID</span><span class="info-val mono" style="font-size:11px;color:var(--muted)">'+v.id+'</span></div></div></div>'
+    +'<div class="footer">FLEETQR · <span>verificado</span> · '+new Date().toLocaleDateString('es-PY')+'</div>';}
+function nf(t,s){return '<div class="not-found"><div class="not-found-icon">🔍</div><div class="not-found-title">'+t+'</div><div class="not-found-sub">'+s+'</div></div>';}
+render();
+<\/script>
+</body>
+</html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'vehiculo.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>
