@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Toyota Corolla Cross 2026 | Motorhaus</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --blue: #0B3D91;
+  --blue-mid: #1554B8;
+  --blue-light: #2E6FD4;
+  --blue-pale: #EBF1FB;
+  --white: #FFFFFF;
+  --off-white: #F7F9FC;
+  --text: #0D1B2A;
+  --muted: #6B7C93;
+  --border: #DDE4EF;
+  --red-toyota: #EB0A1E;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Inter',sans-serif; background:var(--white); color:var(--text); overflow-x:hidden; }
+
+/* NAVBAR */
+.navbar {
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  height:64px; background:rgba(255,255,255,0.97);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 48px; backdrop-filter:blur(12px);
+}
+.navbar-left { display:flex; align-items:center; gap:16px; }
+.toyota-mark { font-family:'Montserrat',sans-serif; font-weight:800; font-size:15px; letter-spacing:4px; color:var(--text); }
+.nav-div { width:1px; height:20px; background:var(--border); }
+.nav-model { font-family:'Montserrat',sans-serif; font-size:13px; font-weight:500; color:var(--muted); letter-spacing:2px; }
+.mh-logo { height:32px; object-fit:contain; }
+.mh-text { font-family:'Montserrat',sans-serif; font-weight:800; font-size:18px; letter-spacing:3px; color:var(--blue); display:none; }
+
+/* HERO */
+.hero {
+  min-height:100vh; padding-top:64px;
+  background:linear-gradient(135deg,#0B3D91 0%,#0a2d6e 55%,#071f50 100%);
+  display:flex; align-items:center; position:relative; overflow:hidden;
+}
+.hero::before {
+  content:''; position:absolute; right:-8%; top:-15%;
+  width:680px; height:680px; border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.05) 0%,transparent 70%);
+  pointer-events:none;
+}
+.hero-content {
+  position:relative; z-index:2; padding:0 48px;
+  max-width:500px; animation:fadeUp 0.9s ease both 0.2s;
+}
+.hero-eyebrow { font-size:11px; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:16px; }
+.hero-title { font-family:'Montserrat',sans-serif; font-weight:900; font-size:clamp(54px,8vw,92px); line-height:0.9; color:white; letter-spacing:-1px; margin-bottom:24px; }
+.hero-title .cross { color:rgba(255,255,255,0.22); display:block; }
+.hero-desc { font-size:15px; font-weight:300; color:rgba(255,255,255,0.6); line-height:1.7; margin-bottom:36px; max-width:360px; }
+.hero-badge { display:inline-flex; align-items:center; gap:10px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:10px 22px; }
+.badge-dot { width:7px; height:7px; border-radius:50%; background:#4ade80; animation:blink 2s infinite; }
+.hero-badge span { font-size:12px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:white; }
+.hero-car { position:absolute; right:0; top:50%; transform:translateY(-50%); width:62%; max-width:820px; z-index:1; animation:carSlide 1.2s cubic-bezier(0.16,1,0.3,1) both 0.3s; }
+.hero-car img { width:100%; height:auto; object-fit:contain; filter:drop-shadow(0 30px 80px rgba(0,0,0,0.4)); }
+.mh-wm { position:absolute; bottom:32px; right:48px; font-family:'Montserrat',sans-serif; font-weight:700; font-size:11px; letter-spacing:4px; color:rgba(255,255,255,0.18); writing-mode:vertical-rl; text-transform:uppercase; }
+
+/* SECTION HEADER */
+.sh { margin-bottom:48px; }
+.sh .ey { font-size:11px; font-weight:600; letter-spacing:4px; text-transform:uppercase; color:var(--blue-light); margin-bottom:8px; }
+.sh h2 { font-family:'Montserrat',sans-serif; font-weight:800; font-size:clamp(28px,4vw,42px); color:var(--text); letter-spacing:-0.5px; }
+.sh h2 span { color:var(--blue); }
+
+/* INTERIOR */
+.interior { background:var(--off-white); padding:100px 0; }
+.sec-inner { max-width:1160px; margin:0 auto; padding:0 48px; }
+.int-grid { display:grid; grid-template-columns:1.4fr 1fr; gap:3px; }
+.int-main { grid-row:span 2; position:relative; overflow:hidden; background:#ccc; min-height:460px; }
+.int-main img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s; }
+.int-main:hover img { transform:scale(1.03); }
+.int-small { display:grid; grid-template-columns:1fr 1fr; gap:3px; }
+.int-thumb { position:relative; overflow:hidden; background:#bbb; min-height:220px; }
+.int-thumb img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.5s; }
+.int-thumb:hover img { transform:scale(1.05); }
+.cap { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top,rgba(11,61,145,0.82),transparent); padding:20px 14px 10px; font-size:10px; font-weight:600; letter-spacing:1.5px; color:rgba(255,255,255,0.9); text-transform:uppercase; }
+
+/* FICHA TÉCNICA */
+.specs { padding:100px 0; background:var(--white); }
+.specs-grid { display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-bottom:64px; }
+.sg { background:var(--off-white); border:1px solid var(--border); padding:32px 28px; }
+.sg-title { font-family:'Montserrat',sans-serif; font-size:10px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--blue); padding-bottom:14px; border-bottom:2px solid var(--blue); margin-bottom:18px; }
+.sr { display:flex; justify-content:space-between; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--border); gap:12px; }
+.sr:last-child { border-bottom:none; }
+.sk { font-size:12px; color:var(--muted); font-weight:500; flex-shrink:0; max-width:46%; }
+.sv { font-size:13px; font-weight:600; color:var(--text); text-align:right; line-height:1.4; }
+.sv.hl { color:var(--blue); }
+.modes-r { display:flex; gap:5px; flex-wrap:wrap; justify-content:flex-end; }
+.mt { font-size:10px; font-weight:700; letter-spacing:1.5px; padding:3px 9px; border:1px solid; }
+.mt.eco { color:#16a34a; border-color:#16a34a; background:#f0fdf4; }
+.mt.norm { color:var(--blue); border-color:var(--blue); background:var(--blue-pale); }
+.mt.pwr { color:var(--red-toyota); border-color:var(--red-toyota); background:#fff1f2; }
+.mt.ev { color:#7c3aed; border-color:#7c3aed; background:#f5f3ff; }
+.color-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:3px; }
+.cc { position:relative; overflow:hidden; background:#ccc; }
+.cc img { width:100%; height:200px; object-fit:cover; display:block; transition:transform 0.4s; }
+.cc:hover img { transform:scale(1.04); }
+.clbl { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top,rgba(11,61,145,0.78),transparent); padding:18px 14px 10px; font-size:10px; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:white; }
+
+/* PRECIOS */
+.prices { background:var(--blue); padding:100px 0; }
+.prices .sh .ey { color:rgba(255,255,255,0.45); }
+.prices .sh h2 { color:white; }
+.prices .sh h2 span { color:rgba(255,255,255,0.35); }
+.pg { display:grid; grid-template-columns:repeat(6,1fr); gap:2px; margin-bottom:72px; }
+.pc { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); padding:28px 18px; text-align:center; transition:background 0.3s; }
+.pc:hover { background:rgba(255,255,255,0.13); }
+.pc.best { background:white; border-color:white; }
+.pc .pl { font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.45); margin-bottom:10px; }
+.pc.best .pl { color:var(--muted); }
+.pc .am { font-family:'Montserrat',sans-serif; font-weight:800; font-size:22px; color:white; letter-spacing:-0.5px; }
+.pc.best .am { color:var(--blue); }
+.pc .su { font-size:11px; color:rgba(255,255,255,0.35); margin-top:5px; }
+.pc.best .su { color:var(--muted); }
+.cmp-hdr { margin-bottom:20px; }
+.cmp-hdr h3 { font-family:'Montserrat',sans-serif; font-weight:700; font-size:20px; color:white; margin-bottom:5px; }
+.cmp-hdr p { font-size:12px; color:rgba(255,255,255,0.4); }
+.tw { overflow-x:auto; border:1px solid rgba(255,255,255,0.12); }
+table { width:100%; border-collapse:collapse; min-width:860px; }
+thead tr { background:rgba(255,255,255,0.08); }
+thead th { padding:13px 16px; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.55); text-align:left; border-bottom:1px solid rgba(255,255,255,0.1); }
+tbody tr { border-bottom:1px solid rgba(255,255,255,0.06); transition:background 0.2s; }
+tbody tr:hover { background:rgba(255,255,255,0.04); }
+tbody tr.hl { background:rgba(255,255,255,0.08); border-left:3px solid white; }
+tbody td { padding:14px 16px; font-size:13px; color:rgba(255,255,255,0.75); vertical-align:top; }
+tbody td:first-child { font-weight:700; color:white; font-size:14px; }
+.bdg { display:inline-block; font-size:9px; font-weight:700; letter-spacing:1px; padding:2px 7px; background:rgba(74,222,128,0.15); border:1px solid rgba(74,222,128,0.3); color:#4ade80; text-transform:uppercase; margin-top:4px; }
+.star::after { content:' ✦'; color:#fbbf24; font-size:11px; }
+.dt { font-size:11px; color:rgba(255,255,255,0.35); margin-top:4px; line-height:1.4; font-weight:400; max-width:190px; }
+
+/* FOOTER */
+.footer { background:#0D1B2A; padding:72px 48px 40px; }
+.ft-inner { max-width:1160px; margin:0 auto; }
+.ft-top { display:flex; justify-content:space-between; align-items:flex-start; padding-bottom:48px; border-bottom:1px solid rgba(255,255,255,0.07); flex-wrap:wrap; gap:32px; }
+.ft-brand { font-family:'Montserrat',sans-serif; font-weight:800; font-size:22px; letter-spacing:3px; color:white; }
+.ft-brand span { color:var(--blue-light); }
+.ft-tag { font-size:12px; color:rgba(255,255,255,0.3); margin-top:6px; letter-spacing:1px; }
+.socials { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.sl { display:flex; align-items:center; gap:8px; text-decoration:none; padding:10px 18px; border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.6); font-size:12px; font-weight:600; letter-spacing:1px; transition:all 0.3s; }
+.sl:hover { border-color:rgba(255,255,255,0.35); color:white; }
+.si { width:17px; height:17px; fill:currentColor; flex-shrink:0; }
+.ft-qr { display:flex; align-items:center; gap:32px; padding-top:40px; flex-wrap:wrap; }
+.qr-wrap { background:white; padding:12px; display:inline-block; }
+.qr-info h4 { font-family:'Montserrat',sans-serif; font-weight:700; font-size:15px; color:white; margin-bottom:6px; letter-spacing:1px; }
+.qr-info p { font-size:12px; color:rgba(255,255,255,0.35); line-height:1.6; max-width:260px; }
+.ft-copy { margin-top:32px; font-size:11px; color:rgba(255,255,255,0.18); letter-spacing:0.5px; line-height:1.7; }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes carSlide { from{opacity:0;transform:translateY(-50%) translateX(60px)} to{opacity:1;transform:translateY(-50%) translateX(0)} }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+@media(max-width:900px){
+  .navbar{padding:0 20px;}
+  .hero-content{padding:0 24px;max-width:100%;}
+  .hero-car{position:relative;right:auto;top:auto;transform:none;width:100%;margin-top:24px;}
+  .hero{flex-direction:column;justify-content:center;padding:80px 0 32px;}
+  .int-grid,.specs-grid,.color-strip{grid-template-columns:1fr;}
+  .int-main{min-height:240px;}
+  .pg{grid-template-columns:repeat(3,1fr);}
+  .sec-inner{padding:0 24px;}
+  .footer{padding:48px 24px 32px;}
+  .mh-wm{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-left">
+    <span class="toyota-mark">TOYOTA</span>
+    <div class="nav-div"></div>
+    <span class="nav-model">COROLLA CROSS · 2026</span>
+  </div>
+  <a href="https://motorhaus.com.py" target="_blank">
+    <img class="mh-logo" src="data:image/png;base64,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" alt="Motorhaus" style="height:32px;">
+    <span class="mh-text">MOTORHAUS</span>
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-eyebrow">SUV Compacta · Híbrida · 2026</p>
+    <h1 class="hero-title">COROLLA<span class="cross">CROSS</span></h1>
+    <p class="hero-desc">Tecnología híbrida de última generación. Diseño que trasciende. Confiabilidad Toyota.</p>
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span>Disponible</span>
+    </div>
+  </div>
+  <div class="hero-car">
+    <img
+      src="https://di-uploads-pod42.dealerinspire.com/regencytoyota/uploads/2025/08/2026-Toyota-Corolla-Cross-LE-AWD-1.png"
+      onerror="this.src='https://www.motortrend.com/uploads/2024/06/2025-Toyota-Corolla-Cross-003.jpg'"
+      alt="Toyota Corolla Cross 2026">
+  </div>
+  <div class="mh-wm">MOTORHAUS</div>
+</section>
+
+<!-- INTERIOR -->
+<section class="interior">
+  <div class="sec-inner">
+    <div class="sh">
+      <p class="ey">Galería</p>
+      <h2>Interior <span>Premium</span></h2>
+    </div>
+    <div class="int-grid">
+      <div class="int-main">
+        <img src="https://hips.hearstapps.com/hmg-prod/images/2026-toyota-corolla-cross-102-6638c7c6b9c50.jpg"
+             onerror="this.src='https://www.motortrend.com/uploads/2024/06/2025-Toyota-Corolla-Cross-014.jpg'"
+             alt="Interior">
+        <div class="cap">Tablero renovado · Diseño centrado en el conductor</div>
+      </div>
+      <div>
+        <div class="int-small">
+          <div class="int-thumb">
+            <img src="https://hips.hearstapps.com/hmg-prod/images/2026-toyota-corolla-cross-106-6638c7c9a1f39.jpg"
+                 onerror="this.src='https://www.motortrend.com/uploads/2024/06/2025-Toyota-Corolla-Cross-010.jpg'"
+                 alt="Pantalla">
+            <div class="cap">Pantalla 10.5" · CarPlay & Android Auto</div>
+          </div>
+          <div class="int-thumb">
+            <img src="https://www.motortrend.com/uploads/2024/06/2025-Toyota-Corolla-Cross-013.jpg"
+                 onerror="this.src='https://hips.hearstapps.com/hmg-prod/images/2026-toyota-corolla-cross-108-6638c7cbd5dfc.jpg'"
+                 alt="Tablero digital">
+            <div class="cap">Tablero full digital 12.3"</div>
+          </div>
+          <div class="int-thumb">
+            <img src="https://hips.hearstapps.com/hmg-prod/images/2026-toyota-corolla-cross-104-6638c7c85a7b2.jpg"
+                 onerror="this.src='https://www.motortrend.com/uploads/2024/06/2025-Toyota-Corolla-Cross-012.jpg'"
+                 alt="Asientos">
+            <div class="cap">Asientos · Tapizado de cuero</div>
+          </div>
+          <div class="int-thumb">
+            <img src="https://www.motortrend.com/uploads/2024/06/2025-Toyota-Corolla-Cross-010.jpg"
+                 onerror="this.src='https://hips.hearstapps.com/hmg-prod/images/2026-toyota-corolla-cross-105-6638c7c9124c8.jpg'"
+                 alt="Caja CVT">
+            <div class="cap">Caja CVT · Modos de manejo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FICHA TÉCNICA -->
+<section class="specs">
+  <div class="sec-inner">
+    <div class="sh">
+      <p class="ey">Especificaciones</p>
+      <h2>Ficha <span>Técnica</span></h2>
+    </div>
+    <div class="specs-grid">
+      <div class="sg">
+        <div class="sg-title">Motor</div>
+        <div class="sr"><span class="sk">Tipo</span><span class="sv">1.8L · 4 cilindros · VVT-iE</span></div>
+        <div class="sr"><span class="sk">Sistema</span><span class="sv hl">Full Hybrid (HEV)</span></div>
+        <div class="sr"><span class="sk">Distribución</span><span class="sv">16V · DOHC</span></div>
+        <div class="sr"><span class="sk">Cilindrada</span><span class="sv">1.798 cc</span></div>
+        <div class="sr"><span class="sk">Alimentación</span><span class="sv">Inyección electrónica multipunto</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-title">Transmisión y Tracción</div>
+        <div class="sr"><span class="sk">Transmisión</span><span class="sv hl">e-CVT Automática</span></div>
+        <div class="sr"><span class="sk">Velocidades simuladas</span><span class="sv">10 relaciones</span></div>
+        <div class="sr"><span class="sk">Tracción base</span><span class="sv">FWD (delantera)</span></div>
+        <div class="sr"><span class="sk">Tracción opcional</span><span class="sv hl">AWD · E-Four electrónico</span></div>
+        <div class="sr"><span class="sk">Modos de manejo</span>
+          <div class="modes-r">
+            <span class="mt eco">ECO</span>
+            <span class="mt norm">NORMAL</span>
+            <span class="mt pwr">POWER</span>
+            <span class="mt ev">EV</span>
+          </div>
+        </div>
+      </div>
+      <div class="sg">
+        <div class="sg-title">Potencia y Consumo</div>
+        <div class="sr"><span class="sk">Potencia combinada</span><span class="sv hl">196 HP</span></div>
+        <div class="sr"><span class="sk">Potencia motor combus.</span><span class="sv">98 HP / 5.200 rpm</span></div>
+        <div class="sr"><span class="sk">Torque motor combus.</span><span class="sv">142 Nm / 3.600 rpm</span></div>
+        <div class="sr"><span class="sk">Consumo combinado</span><span class="sv hl">5.0 L / 100 km</span></div>
+        <div class="sr"><span class="sk">0–100 km/h</span><span class="sv">7.3 seg (versión híbrida)</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-title">Batería y Motor Eléctrico</div>
+        <div class="sr"><span class="sk">Tipo batería</span><span class="sv">Níquel Metal Hidruro (Ni-MH)</span></div>
+        <div class="sr"><span class="sk">Voltaje</span><span class="sv">201.6 V</span></div>
+        <div class="sr"><span class="sk">Capacidad</span><span class="sv">6.5 Ah</span></div>
+        <div class="sr"><span class="sk">Motor eléctrico</span><span class="sv hl">72 HP · 163 Nm</span></div>
+        <div class="sr"><span class="sk">Garantía batería</span><span class="sv">8 años / 100.000 km</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-title">Cámaras y Sensores</div>
+        <div class="sr"><span class="sk">Cámara trasera</span><span class="sv hl">De serie</span></div>
+        <div class="sr"><span class="sk">Cámara 360°</span><span class="sv">Versiones superiores</span></div>
+        <div class="sr"><span class="sk">Sensores estacionamiento</span><span class="sv">Delanteros y traseros (x4)</span></div>
+        <div class="sr"><span class="sk">Monitor punto ciego</span><span class="sv hl">BSM · Alerta cruce trasero</span></div>
+        <div class="sr"><span class="sk">Cámara parabrisas</span><span class="sv">TSS 3.0 · detección peatones</span></div>
+      </div>
+      <div class="sg">
+        <div class="sg-title">Seguridad · Toyota Safety Sense 3.0</div>
+        <div class="sr"><span class="sk">Pre-colisión (PCS)</span><span class="sv hl">Frenado automático de emergencia</span></div>
+        <div class="sr"><span class="sk">Control crucero</span><span class="sv">Adaptativo con radar (DRCC)</span></div>
+        <div class="sr"><span class="sk">Mantenimiento carril</span><span class="sv">LDA con dirección asistida</span></div>
+        <div class="sr"><span class="sk">Airbags</span><span class="sv">7 airbags (frontales, laterales, cortina, rodilla)</span></div>
+        <div class="sr"><span class="sk">Estabilidad / Tracción</span><span class="sv">VSC · TRC · HAC pendientes</span></div>
+      </div>
+    </div>
+
+    <!-- Color strip -->
+    <div class="color-strip">
+      <div class="cc">
+        <img src="https://di-uploads-pod1.dealerinspire.com/bathurstoyota/uploads/2025/08/2026-Toyota-Corolla-Cross-LE-AWD.png"
+             onerror="this.src='https://www.cars.com/i/large/in/v2/stock_photos/cb46e38e-29bb-4db6-8697-21a8f03e50ae/65e76c4a-fce8-4b9f-a5ca-27c60e3c3b3e.jpeg'"
+             alt="Negro">
+        <div class="clbl">Negro Ébano</div>
+      </div>
+      <div class="cc">
+        <img src="https://di-uploads-pod43.dealerinspire.com/baysidetoota/uploads/2025/07/2026-TCCh-XSE-Cement-Front34.webp"
+             onerror="this.src='https://di-uploads-pod14.dealerinspire.com/manchestertoyota/uploads/2025/09/2026-Toyota-Corolla-Cross-XLE.png'"
+             alt="Gris Plata">
+        <div class="clbl">Gris Plata</div>
+      </div>
+      <div class="cc">
+        <img src="https://di-uploads-pod1.dealerinspire.com/bathurstoyota/uploads/2025/09/2026-Toyota-Corolla-Cross-L-AWD.png"
+             onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/e/e6/Toyota_Corolla_Cross_2022.jpg/1280px-Toyota_Corolla_Cross_2022.jpg'"
+             alt="Gris Oscuro">
+        <div class="clbl">Gris Oscuro</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRECIOS + COMPARATIVA -->
+<section class="prices">
+  <div class="sec-inner">
+    <div class="sh">
+      <p class="ey">Financiación</p>
+      <h2>Planes de <span>Pago</span></h2>
+    </div>
+    <div class="pg">
+      <div class="pc best"><div class="pl">Contado</div><div class="am">$31.500</div><div class="su">Mejor precio</div></div>
+      <div class="pc"><div class="pl">12 meses</div><div class="am">$33.000</div><div class="su">Total USD</div></div>
+      <div class="pc"><div class="pl">24 meses</div><div class="am">$35.500</div><div class="su">Total USD</div></div>
+      <div class="pc"><div class="pl">36 meses</div><div class="am">$37.500</div><div class="su">Total USD</div></div>
+      <div class="pc"><div class="pl">48 meses</div><div class="am">$39.000</div><div class="su">Total USD</div></div>
+      <div class="pc"><div class="pl">60 meses</div><div class="am">$41.000</div><div class="su">Total USD</div></div>
+    </div>
+    <div class="cmp-hdr">
+      <h3>Comparativo de Modelos · Gama Toyota</h3>
+      <p>Características técnicas y posicionamiento de cada versión disponible</p>
+    </div>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th>Modelo</th>
+            <th>Motor / Sistema</th>
+            <th>Potencia</th>
+            <th>Tracción</th>
+            <th>Transmisión</th>
+            <th>Contado</th>
+            <th>Llegada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hl">
+            <td class="star">Corolla Cross 2026
+              <div class="dt">SUV compacta híbrida. Mayor eficiencia de la gama, menor costo operativo. Ideal para ciudad y ruta.</div>
+              <span class="bdg">Destacado</span>
+            </td>
+            <td>1.8L Full Hybrid HEV</td>
+            <td>196 HP combinado</td>
+            <td>FWD / AWD E-Four</td>
+            <td>e-CVT · 4 modos</td>
+            <td><strong style="color:white;">$31.500</strong></td>
+            <td>28/02/2026</td>
+          </tr>
+          <tr>
+            <td>RAV4 2.5 4X2 <span style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:400;"> (carrocería anterior)</span>
+              <div class="dt">SUV mediana en versión de transición. Motor 2.5L de mayor potencia que el Corolla Cross.</div>
+            </td>
+            <td>2.5L Full Hybrid HEV</td>
+            <td>222 HP combinado</td>
+            <td>FWD</td>
+            <td>e-CVT automática</td>
+            <td>$43.000</td>
+            <td>20/05/2026</td>
+          </tr>
+          <tr>
+            <td>RAV4 2.0 4X2
+              <div class="dt">SUV mediana entrada de gama. Motor 2.0L híbrido, equilibrio entre precio y prestaciones.</div>
+            </td>
+            <td>2.0L Full Hybrid HEV</td>
+            <td>~180 HP combinado</td>
+            <td>FWD</td>
+            <td>e-CVT automática</td>
+            <td>$50.000</td>
+            <td>26/05/2026</td>
+          </tr>
+          <tr>
+            <td>RAV4 2.0 4X4
+              <div class="dt">Misma mecánica 2.0L con tracción integral. Ideal para terrenos variados y condiciones adversas.</div>
+            </td>
+            <td>2.0L Full Hybrid HEV</td>
+            <td>~180 HP combinado</td>
+            <td>AWD E-Four</td>
+            <td>e-CVT automática</td>
+            <td>$53.000</td>
+            <td>26/05/2026</td>
+          </tr>
+          <tr>
+            <td>RAV4 2.5 4X2
+              <div class="dt">Motor 2.5L con carrocería actual. Mayor confort y rendimiento sostenido en autopista.</div>
+            </td>
+            <td>2.5L Full Hybrid HEV</td>
+            <td>222 HP combinado</td>
+            <td>FWD</td>
+            <td>e-CVT automática</td>
+            <td>$57.000</td>
+            <td>26/05/2026</td>
+          </tr>
+          <tr>
+            <td>RAV4 2.5 4X4
+              <div class="dt">Tope de gama. Máxima potencia + AWD inteligente. Para quienes priorizan rendimiento total.</div>
+            </td>
+            <td>2.5L Full Hybrid HEV</td>
+            <td>222 HP combinado</td>
+            <td>AWD E-Four</td>
+            <td>e-CVT automática</td>
+            <td>$59.000</td>
+            <td>26/05/2026</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="ft-inner">
+    <div class="ft-top">
+      <div>
+        <div class="ft-brand">MOTOR<span>HAUS</span></div>
+        <div class="ft-tag">Libertad en movimiento · motorhaus.com.py</div>
+      </div>
+      <div class="socials">
+        <a href="https://www.instagram.com/motorhauspy" target="_blank" class="sl">
+          <svg class="si" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          @motorhauspy
+        </a>
+        <a href="https://www.facebook.com/motorhauspy/" target="_blank" class="sl">
+          <svg class="si" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          motorhauspy
+        </a>
+        <a href="https://motorhaus.com.py/" target="_blank" class="sl">
+          <svg class="si" viewBox="0 0 24 24"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-1 16.057v-3.057h2.994c-.059 1.143-.212 2.24-.456 3.228-.688-.227-1.606-.371-2.538-.171zm1.957 2.162c-.499 1.33-1.159 2.497-1.957 3.456v-3.62c.666.028 1.319.081 1.957.164zm-1.957-7.219V7.044c.851.029 1.705.086 2.549.188-.302 1.276-.53 2.652-.592 4.113H10zm0-5.949V.275c.798.959 1.458 2.126 1.957 3.456-.638.083-1.291.136-1.957.164zm2.336-.203c.331-1.132.769-2.173 1.315-3.027.677.498 1.301 1.099 1.819 1.793-.82.373-1.63.725-2.368 1.016-.261-.6-.509-1.159-.766-1.782z"/></svg>
+          motorhaus.com.py
+        </a>
+      </div>
+    </div>
+    <div class="ft-qr">
+      <div class="qr-wrap"><div id="qrcode"></div></div>
+      <div class="qr-info">
+        <h4>ESCANEÁ Y COMPARTÍ</h4>
+        <p>Accedé a esta ficha técnica completa desde tu celular escaneando el código QR.</p>
+      </div>
+    </div>
+    <p class="ft-copy">
+      © 2026 Motor Haus Paraguay · Av. España y Tte. Saldívar 2447, Asunción · +595 981 010 014<br>
+      Precios en USD. Sujetos a cambios sin previo aviso. Consultá disponibilidad con tu asesor comercial.
+    </p>
+  </div>
+</footer>
+
+<script>
+window.addEventListener('load', function() {
+  new QRCode(document.getElementById("qrcode"), {
+    text: 'https://paulgrillon05-ai.github.io/fleetqr/QRRRR',
+    width: 140, height: 140,
+    colorDark: "#000000", colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H
+  });
+});
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.style.opacity='1'; e.target.style.transform='translateY(0)'; }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.sg,.pc,.cc,.int-thumb,.int-main').forEach(el => {
+  el.style.opacity='0'; el.style.transform='translateY(16px)';
+  el.style.transition='opacity 0.5s ease, transform 0.5s ease';
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
